@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+	<id>governanceauditlab</id>
+	<name>Governance Audit Lab</name>
+	<summary><![CDATA[Experimental governance & audit lab for Nextcloud: file labels, filecache explorer, and hash-chained audit trails.]]></summary>
+	<description><![CDATA[Governance & Audit Lab is an experimental Nextcloud app for exploring governance and audit patterns. It provides three modules:
+
+• Governance Playground – define and apply labels (e.g. Public, Internal, Confidential) to files and folders and enforce simple local rules such as blocking public shares for Confidential items.
+• Filecache Explorer – admin-only diagnostics for inspecting filecache entries, running scoped occ files:scan operations, and viewing before/after snapshots for debugging sync and indexing issues.
+• Audit Trail Sandbox – capture file-related events (create/delete/share/label changes) in an audit_events table with a simple hash chain, and provide an admin UI to filter events and verify basic chain integrity.
+
+The app is intended as an internal sandbox for prototyping concepts that can later be reused in production-grade governance and compliance products.]]></description>
+	<version>1.0.0</version>
+	<licence>agpl</licence>
+	<author mail="max.mirkia@gmail.com" homepage="">Max Mirkia</author>
+	<namespace>GovernanceAuditLab</namespace>
+	<category>files</category>
+	<category>monitoring</category>
+	<category>security</category>
+	<category>tools</category>
+	<bugs>https://mehdimirkia.com</bugs>
+	<dependencies>
+		<nextcloud min-version="30" max-version="32"/>
+	</dependencies>
+	<navigations>
+		<navigation>
+			<id>governanceauditlab</id>
+			<name>Governance Audit Lab</name>
+			<route>governanceauditlab.page.index</route>
+			<icon>app.svg</icon>
+			<type>link</type>
+		</navigation>
+	</navigations>
+</info>
