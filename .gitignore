@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# PHP / vendor
+/vendor/
+
+# Node
+node_modules/
+
+# Docker / volumes (if you add any)
+*.log
