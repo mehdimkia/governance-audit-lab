@@ -9,4 +9,9 @@ Util::addStyle(OCA\GovernanceAuditLab\AppInfo\Application::APP_ID, OCA\Governanc
 
 ?>
 
-<div id="governanceauditlab"></div>
+<div id="governanceauditlab">
+    <div class="section">
+        <h1>Governance &amp; Audit Lab</h1>
+        <p>Hello world from our first Nextcloud app view 🎉</p>
+    </div>
+</div>
