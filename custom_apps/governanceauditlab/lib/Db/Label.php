@@ -20,16 +20,23 @@ use OCP\DB\Types;
  * @method void setCreatedAt(?\DateTimeImmutable $createdAt)
  */
 class Label extends Entity {
-    protected string $name;
-    protected ?string $description = null;
-    protected ?string $createdBy = null;
-    protected ?\DateTimeImmutable $createdAt = null;
+	/** @var string|null */
+	protected $name;
 
-    public function __construct() {
-        $this->addType('id', Types::INTEGER);
-        $this->addType('name', Types::STRING);
-        $this->addType('description', Types::STRING);
-        $this->addType('createdBy', Types::STRING);
-        $this->addType('createdAt', Types::DATETIME_IMMUTABLE);
-    }
+	/** @var string|null */
+	protected $description;
+
+	/** @var string|null */
+	protected $createdBy;
+
+	/** @var \DateTimeImmutable|null */
+	protected $createdAt;
+
+	public function __construct() {
+		$this->addType('id', Types::INTEGER);
+		$this->addType('name', Types::STRING);
+		$this->addType('description', Types::STRING);
+		$this->addType('createdBy', Types::STRING);
+		$this->addType('createdAt', Types::DATETIME_IMMUTABLE);
+	}
 }
