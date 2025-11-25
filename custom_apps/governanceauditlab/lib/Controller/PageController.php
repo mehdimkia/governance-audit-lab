@@ -16,6 +16,7 @@ use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
+use OCP\AppFramework\Http\RedirectResponse;
 
 /**
  * @psalm-suppress UnusedClass
@@ -34,13 +35,18 @@ class PageController extends Controller {
 	}
 
 	#[NoCSRFRequired]
-	#[NoAdminRequired]
+	#[AdminRequired]
 	#[OpenAPI(OpenAPI::SCOPE_IGNORE)]
 	#[FrontpageRoute(verb: 'GET', url: '/')]
 	public function index(): TemplateResponse {
+		$labels = $this->labelService->getAll();
+	
 		return new TemplateResponse(
 			Application::APP_ID,
 			'index',
+			[
+				'labels' => $labels,
+			],
 		);
 	}
 
@@ -61,6 +67,22 @@ class PageController extends Controller {
 
 		return new JSONResponse($data);
 	}
+
+	#[NoCSRFRequired]
+	#[AdminRequired]
+	#[OpenAPI(OpenAPI::SCOPE_IGNORE)]
+	#[FrontpageRoute(verb: 'POST', url: '/labels/form')]
+	public function createLabelForm(string $name, ?string $description = null): RedirectResponse {
+		try {
+			$this->labelService->create($name, $description);
+		} catch (\Throwable $e) {
+			// TODO: optionally log or pass an error flag via query string
+		}
+
+		// After creating (or failing), go back to the main admin UI
+		return new RedirectResponse('/apps/governanceauditlab/');
+	}
+	
 
 	#[NoCSRFRequired]
 	#[AdminRequired] // only admins may create labels
@@ -86,4 +108,5 @@ class PageController extends Controller {
 			], 500);
 		}
 	}
+
 }
