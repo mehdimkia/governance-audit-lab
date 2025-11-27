@@ -46,4 +46,19 @@ class LabelMapper extends QBMapper {
 
 		return $labels[0] ?? null;
 	}
+
+	public function findById(int $id): ?Label {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
+			)
+			->setMaxResults(1);
+	
+		/** @var Label[] $labels */
+		$labels = $this->findEntities($qb);
+		return $labels[0] ?? null;
+	}
+	
 }

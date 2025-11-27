@@ -8,11 +8,13 @@ use OCA\GovernanceAuditLab\AppInfo\Application;
 /** @var array $_ */
 
 Util::addScript(Application::APP_ID, Application::APP_ID . '-main');
-// Load our small custom stylesheet
 Util::addStyle(Application::APP_ID, 'admin');
 
 /** @var \OCA\GovernanceAuditLab\Db\Label[] $labels */
 $labels = $_['labels'] ?? [];
+
+/** @var \OCA\GovernanceAuditLab\Db\Label|null $editLabel */
+$editLabel = $_['editLabel'] ?? null;
 
 ?>
 
@@ -45,6 +47,31 @@ $labels = $_['labels'] ?? [];
 						<button type="submit" class="primary">Create label</button>
 					</div>
 				</form>
+
+				<?php if ($editLabel !== null): ?>
+					<section class="gal-edit">
+						<h2>Edit label</h2>
+						<form method="post" action="/index.php/apps/governanceauditlab/labels/update">
+							<input type="hidden" name="id" value="<?php p($editLabel->getId()); ?>">
+
+							<div class="gal-field">
+								<label for="edit-label-name">Name</label>
+								<input type="text" id="edit-label-name" name="name"
+								       value="<?php p($editLabel->getName()); ?>" required maxlength="64">
+							</div>
+
+							<div class="gal-field">
+								<label for="edit-label-description">Description (optional)</label>
+								<textarea id="edit-label-description" name="description" rows="3"><?php p($editLabel->getDescription()); ?></textarea>
+							</div>
+
+							<div class="gal-actions">
+								<button type="submit" class="primary">Save changes</button>
+								<a href="/index.php/apps/governanceauditlab/" class="button gal-small-btn">Cancel</a>
+							</div>
+						</form>
+					</section>
+				<?php endif; ?>
 			</section>
 
 			<section class="gal-column gal-table">
@@ -59,6 +86,7 @@ $labels = $_['labels'] ?? [];
 							<th>ID</th>
 							<th>Name</th>
 							<th>Description</th>
+							<th class="gal-actions-cell">Actions</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -67,6 +95,19 @@ $labels = $_['labels'] ?? [];
 								<td><?php p($label->getId()); ?></td>
 								<td class="gal-label-name"><?php p($label->getName()); ?></td>
 								<td><?php p($label->getDescription()); ?></td>
+								<td class="gal-actions-cell">
+									<a href="/index.php/apps/governanceauditlab/?editId=<?php p($label->getId()); ?>"
+									   class="button gal-small-btn">Edit</a>
+
+									<form method="post"
+									      action="/index.php/apps/governanceauditlab/labels/delete"
+									      class="gal-inline-form">
+										<input type="hidden" name="id" value="<?php p($label->getId()); ?>">
+										<button type="submit" class="button gal-small-btn gal-danger-btn">
+											Delete
+										</button>
+									</form>
+								</td>
 							</tr>
 						<?php endforeach; ?>
 						</tbody>

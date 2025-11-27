@@ -41,11 +41,21 @@ class PageController extends Controller {
 	public function index(): TemplateResponse {
 		$labels = $this->labelService->getAll();
 	
+		$editLabel = null;
+		$editIdParam = $this->request->getParam('editId');
+		if ($editIdParam !== null) {
+			$id = (int)$editIdParam;
+			if ($id > 0) {
+				$editLabel = $this->labelService->find($id);
+			}
+		}
+	
 		return new TemplateResponse(
 			Application::APP_ID,
 			'index',
 			[
-				'labels' => $labels,
+				'labels'    => $labels,
+				'editLabel' => $editLabel,
 			],
 		);
 	}
@@ -107,6 +117,29 @@ class PageController extends Controller {
 				'exception' => get_class($e),
 			], 500);
 		}
+	}
+	#[NoCSRFRequired]
+	#[AdminRequired]
+	#[OpenAPI(OpenAPI::SCOPE_IGNORE)]
+	#[FrontpageRoute(verb: 'POST', url: '/labels/update')]
+	public function updateLabel(int $id, string $name, ?string $description = null): RedirectResponse {
+		try {
+			$this->labelService->update($id, $name, $description);
+			// On success, go back to list without edit state
+			return new RedirectResponse('/apps/governanceauditlab/');
+		} catch (\Throwable $e) {
+			// On error, stay in edit mode for that label
+			return new RedirectResponse('/apps/governanceauditlab/?editId=' . urlencode((string)$id));
+		}
+	}
+
+	#[NoCSRFRequired]
+	#[AdminRequired]
+	#[OpenAPI(OpenAPI::SCOPE_IGNORE)]
+	#[FrontpageRoute(verb: 'POST', url: '/labels/delete')]
+	public function deleteLabel(int $id): RedirectResponse {
+		$this->labelService->delete($id);
+		return new RedirectResponse('/apps/governanceauditlab/');
 	}
 
 }

@@ -25,25 +25,17 @@ class LabelService {
 		return $this->mapper->findAll();
 	}
 
+	public function find(int $id): ?Label {
+		return $this->mapper->findById($id);
+	}
+
 	/**
-	 * @throws \InvalidArgumentException on validation error
+	 * @throws \InvalidArgumentException
 	 */
 	public function create(string $name, ?string $description = null): Label {
-		$name = trim($name);
-
-		if ($name === '') {
-			throw new \InvalidArgumentException('Label name must not be empty.');
-		}
-
-		if (mb_strlen($name) > 64) {
-			throw new \InvalidArgumentException('Label name must be at most 64 characters.');
-		}
-
-		// enforce uniqueness on name
-		$existing = $this->mapper->findByName($name);
-		if ($existing !== null) {
-			throw new \InvalidArgumentException('A label with this name already exists.');
-		}
+		$name = $this->normalizeName($name);
+		$this->assertNameValid($name);
+		$this->assertNameUnique($name, null);
 
 		$user = $this->userSession->getUser();
 		$userId = $user ? $user->getUID() : null;
@@ -52,8 +44,63 @@ class LabelService {
 		$label->setName($name);
 		$label->setDescription($description);
 		$label->setCreatedBy($userId);
-		$label->setCreatedAt($this->clock->now()); // DateTimeImmutable
+		$label->setCreatedAt($this->clock->now());
 
 		return $this->mapper->insert($label);
 	}
+
+	/**
+	 * @throws \InvalidArgumentException
+	 */
+	public function update(int $id, string $name, ?string $description = null): Label {
+		$name = $this->normalizeName($name);
+		$this->assertNameValid($name);
+		$this->assertNameUnique($name, $id);
+
+		$label = $this->mapper->findById($id);
+		if ($label === null) {
+			throw new \InvalidArgumentException('Label not found.');
+		}
+
+		$label->setName($name);
+		$label->setDescription($description);
+
+		return $this->mapper->update($label);
+	}
+
+	public function delete(int $id): void {
+		$label = $this->mapper->findById($id);
+		if ($label === null) {
+			return; // nothing to delete
+		}
+		$this->mapper->delete($label);
+	}
+
+	private function normalizeName(string $name): string {
+		return trim($name);
+	}
+
+	/**
+	 * @throws \InvalidArgumentException
+	 */
+	private function assertNameValid(string $name): void {
+		if ($name === '') {
+			throw new \InvalidArgumentException('Label name must not be empty.');
+		}
+		if (mb_strlen($name) > 64) {
+			throw new \InvalidArgumentException('Label name must be at most 64 characters.');
+		}
+	}
+
+	/**
+	 * @param int|null $ignoreId label ID to ignore when checking uniqueness (for updates)
+	 * @throws \InvalidArgumentException
+	 */
+	private function assertNameUnique(string $name, ?int $ignoreId): void {
+		$existing = $this->mapper->findByName($name);
+		if ($existing !== null && ($ignoreId === null || $existing->getId() !== $ignoreId)) {
+			throw new \InvalidArgumentException('A label with this name already exists.');
+		}
+	}
 }
+
